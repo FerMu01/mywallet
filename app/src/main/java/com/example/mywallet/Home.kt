@@ -1,8 +1,12 @@
 package com.example.mywallet
 
+import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,11 +17,44 @@ import java.net.URL
 class Home : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var textBienvenida: TextView
+    private lateinit var btnLogout: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home2)
 
+        // Recuperar el nombre de usuario desde SharedPreferences
+        val sharedPref = getSharedPreferences("MyWalletPrefs", Context.MODE_PRIVATE)
+        val username = sharedPref.getString("USERNAME", null)
+
+        // Si no hay usuario guardado, redirigir al Login
+        if (username == null) {
+            val intent = Intent(this, Login::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
+        // Mostrar "Bienvenido <USUARIO>" en el TextView
+        textBienvenida = findViewById(R.id.textBienvenida)
+        textBienvenida.text = "Bienvenido $username"
+
+        // Configurar el botón de logout
+        btnLogout = findViewById(R.id.btnLogout)
+        btnLogout.setOnClickListener {
+            // Borrar el usuario guardado en SharedPreferences
+            val editor = sharedPref.edit()
+            editor.remove("USERNAME")
+            editor.apply()
+
+            // Volver a la pantalla Login
+            val intent = Intent(this, Login::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        // Configurar el RecyclerView y obtener datos de Bitcoin
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 

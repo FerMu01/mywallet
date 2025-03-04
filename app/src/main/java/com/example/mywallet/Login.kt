@@ -15,6 +15,17 @@ class Login : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Verificar si el usuario ya inició sesión
+        val sharedPref = getSharedPreferences("MyWalletPrefs", Context.MODE_PRIVATE)
+        val savedUsername = sharedPref.getString("USERNAME", null)
+        if (savedUsername != null) {
+            // Si ya existe un usuario guardado, redirigir a Home
+            val intent = Intent(this, Home::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
 
@@ -34,22 +45,20 @@ class Login : AppCompatActivity() {
             val password = etPassword.text.toString()
 
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                // Guardar en SharedPreferences
-                val sharedPref = getSharedPreferences("MyWalletPrefs", Context.MODE_PRIVATE)
+                // Guardar el nombre de usuario en SharedPreferences
                 val editor = sharedPref.edit()
                 editor.putString("USERNAME", username)
                 editor.apply()
 
                 Toast.makeText(this, "Usuario guardado correctamente", Toast.LENGTH_SHORT).show()
 
-                // Ir al Home
+                // Ir a la pantalla Home
                 val intent = Intent(this, Home::class.java)
                 startActivity(intent)
-                finish() // Opcional, para que no vuelva atrás al Login
+                finish() // Evita volver al Login al presionar "Atrás"
             } else {
                 Toast.makeText(this, "Por favor, completa los campos", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 }
